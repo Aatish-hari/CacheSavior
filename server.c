@@ -1,12 +1,6 @@
 #include "lib/proxy_parse.h"
 #include "include/functions.h"
-#include <stdio.h>
-#include<string.h>
-#include<pthread.h>
-#include<semaphore.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
+
 
 
 #define MAX_CLIENTS 10
@@ -39,21 +33,6 @@ sem_t semaphore;
 
 int cache_size;
 
-// int handle_request(int client_socket, ParsedRequest *request, char* tempreq){
-//     char* buff = (char*)malloc(MAX_BYTES*sizeof(char));
-//     strcpy(buff, "GET");
-//     strcat(buff, request->path);
-//     strcat(buff, " ");
-//     strcat(buff, request->version);
-//     strcat(buff, "\r\n");
-
-//     int buff_len = strlen(buff);
-//     if(ParsedHeader_get(request, "Host") == NULL){
-//         if(ParsedHeader_set(request, "Host", request->host)<0){
-//             printf("Set host header key failed");
-//         }
-//     }
-// }
 
 
 void* thread_func(void* new_socket){
@@ -83,6 +62,7 @@ void* thread_func(void* new_socket){
     struct element_inside_cache* temp = find(tempreq);          //finding in cache and getting in temp
 
     if(temp != NULL){
+        temp->number_of_usage++;        //
         int size = temp->len/sizeof(char);
         int pos = 0;
         char response[MAX_BYTES];
