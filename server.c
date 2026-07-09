@@ -42,7 +42,8 @@ void* thread_func(void* new_socket){
     int bytes_send_by_client, len;
 
     char* buffer = (char*)calloc(MAX_BYTES, sizeof(char));
-    bytes_send_by_client = recv(socket, buffer, sizeof(buffer), 0);
+    bzero(buffer, MAX_BYTES);	
+    bytes_send_by_client = recv(socket, buffer, MAX_BYTES, 0);
 
     while(bytes_send_by_client>0){
         len = strlen(buffer);           //len of received data
