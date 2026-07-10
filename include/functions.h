@@ -12,6 +12,8 @@
 #include <netdb.h>
 #define MAX_BYTES 1024
 
+pthread_mutex_t lock;
+
 handle_request(int client_socket, struct ParsedRequest *request, char* tempreq);
 connectRemoteServer(char* host_addrs, int server_port);
 int checkHTTPversion(char* version);
