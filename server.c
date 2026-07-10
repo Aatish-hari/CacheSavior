@@ -24,14 +24,14 @@ struct element_inside_cache* find(char* url);
 void remove_cache_element();
 
 
-int port = 8080;
-int server_socket_id;
+// int port = 8080;
+// int server_socket_id;
 
-pthread_t clients[MAX_CLIENTS];
-pthread_mutex_t lock;
-sem_t semaphore;
+// pthread_t clients[MAX_CLIENTS];
+// pthread_mutex_t lock;
+// sem_t semaphore;
 
-int cache_size;
+// int cache_size;
 
 
 

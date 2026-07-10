@@ -1,6 +1,6 @@
 #include"functions.h"
 
-struct element_inside_cache{
+struct element_inside_cache{    //websites
     char* data;
     int len;
     char* url;
@@ -180,3 +180,30 @@ int ErrorMessage(int socket, int status_code)
 	}
 	return 1;
 }
+
+
+struct element_inside_cache* find(char* url){
+    struct element_inside_cache* temp_website = NULL;
+    int temp_lock = pthread_mutex_lock(&lock);
+    printf("Cahce lock acquired %d\n", temp_lock);
+    if(head!=NULL){
+        temp_website = head;
+        while(temp_website!=NULL){
+            if(strcmp(temp_website->url, url)){
+                printf("URL found\n");
+                printf("LRU number of usage before %d\n", temp_website->number_of_usage);
+                temp_website->number_of_usage++;
+                printf("LRU number of usage after %d\n", temp_website->number_of_usage);
+                break;
+            }
+            temp_website = temp_website->next;
+        }
+    }
+    else{
+        printf("NO URL in Cache");
+    }
+    temp_lock = pthread_mutex_unlock(&lock);
+    printf("done finding for url");
+    return temp_website;
+}
+

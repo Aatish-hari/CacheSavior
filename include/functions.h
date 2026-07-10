@@ -10,9 +10,17 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#define MAX_BYTES 1024
 
+#define MAX_BYTES 1024
+#define MAX_CLIENTS 10
+int port = 8080;
+int server_socket_id;
+
+pthread_t clients[MAX_CLIENTS];
 pthread_mutex_t lock;
+sem_t semaphore;
+
+int cache_size;
 
 handle_request(int client_socket, struct ParsedRequest *request, char* tempreq);
 connectRemoteServer(char* host_addrs, int server_port);
