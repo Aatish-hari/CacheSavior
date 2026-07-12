@@ -3,25 +3,16 @@
 
 
 
-#define MAX_CLIENTS 10
-#define MAX_BYTES 1024
 
 
 //its going to be a linked list of elements in cache
-struct element_inside_cache{
-    char* data;
-    int len;
-    char* url;
-    int number_of_usage;   //number of time that cache element is being used, more number = more priority
-    struct element_inside_cache *next;
-};
-
-struct element_inside_cache* head;  //pointer to starting of cache
-
-
-int adding_element_in_cache(char* data, int len, char* url);
-struct element_inside_cache* find(char* url);
-void remove_cache_element();
+// struct element_inside_cache{
+//     char* data;
+//     int len;
+//     char* url;
+//     int number_of_usage;   //number of time that cache element is being used, more number = more priority
+//     struct element_inside_cache *next;
+// };
 
 
 // int port = 8080;
@@ -55,15 +46,12 @@ void* thread_func(void* new_socket){
         }
     }
 
-    char* tempreq = (char*) malloc(strlen(buffer)*sizeof(char));
-    for(int i = 0 ; i<strlen(buffer) ; i++){
-        tempreq[i] = buffer[i];
-    }
-    
+    char* tempreq = (char*) malloc(strlen(buffer)*sizeof(char)+1);
+    strcpy(tempreq, buffer);
     struct element_inside_cache* temp = find(tempreq);          //finding in cache and getting in temp
 
     if(temp != NULL){
-        temp->number_of_usage++;        //
+        // temp->number_of_usage++;        //
         int size = temp->len/sizeof(char);
         int pos = 0;
         char response[MAX_BYTES];
@@ -80,13 +68,13 @@ void* thread_func(void* new_socket){
 
         len = strlen(buffer);
         struct ParsedRequest *request = ParsedRequest_create();
-
+        printf("Received request:\n%s\n", buffer);
         if(ParsedRequest_parse(request, buffer, len)<0){
             printf("parsing failed");
         }
         else{
             bzero(buffer, MAX_BYTES);
-            if(strcmp(request->method, "GET")){
+            if(strcmp(request->method, "GET") == 0){
                 if(request->host && request->path && checkHTTPversion(request->version) == 1){
                     bytes_send_by_client = handle_request(socket, request, tempreq);
                     if(bytes_send_by_client == -1){
@@ -110,6 +98,7 @@ void* thread_func(void* new_socket){
     free(buffer);
     free(tempreq);
     sem_post(&semaphore);
+    return NULL;
     
 }
 
@@ -134,7 +123,7 @@ int main(int argc, char* argv[]){
     }
     
     int reuse = 1;
-    if(setsockopt(server_socket_id, SOL_SOCKET, SO_REUSEADDR, (const char)&reuse, sizeof(reuse))<0){
+    if(setsockopt(server_socket_id, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse))<0){
         perror("Error: Failed setsockopt\n");
     }
 
@@ -173,11 +162,12 @@ int main(int argc, char* argv[]){
 
         struct sockaddr_in *client_ptr = (struct sockaddr_in*)& client_address;     //
         struct in_addr ip_address = client_ptr->sin_addr;   //client address
-        char* ip_str[INET_ADDRSTRLEN];
+        char ip_str[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &ip_address, ip_str, INET_ADDRSTRLEN);   //client ip address conversion to readable formate
         printf("Server connected to client with port %d, and IP adress %s", ntohs(client_ptr->sin_port), ip_str);
 
         pthread_create(&clients[i], NULL, thread_func,(void*)& connected_clients[i]); //passing client fd
+        i++;
     }
     close(server_socket_id);
     return 0;

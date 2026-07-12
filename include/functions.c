@@ -1,7 +1,16 @@
 #include"functions.h"
 
 
-struct element_inside_cache* head;  //pointer to starting of cache
+int port = 8080;
+int server_socket_id;
+
+pthread_t clients[MAX_CLIENTS];
+pthread_mutex_t lock;
+sem_t semaphore;
+
+int cache_size = 0;
+
+struct element_inside_cache *head = NULL;
 
 
 int connectRemoteServer(char* host_addrs, int server_port){
@@ -22,7 +31,7 @@ int connectRemoteServer(char* host_addrs, int server_port){
     bzero((char*)&server_addrs, sizeof(server_addrs));
     server_addrs.sin_family = AF_INET;
     server_addrs.sin_port = htons(server_port);
-    bcopy((char*)&host->h_addr_list[0], (char*)&server_addrs.sin_addr.s_addr, host->h_length);
+    bcopy((char*)host->h_addr_list[0], (char*)&server_addrs.sin_addr.s_addr, host->h_length);
     // server_addrs:-
     // IP:   93.184.216.34
     // Port: 80
@@ -81,6 +90,9 @@ int handle_request(int client_socket, struct ParsedRequest *request, char* tempr
     if(request->port != NULL){
         server_port = atoi(request->port);
     }
+    printf("Host : %s\n", request->host);
+    printf("Port : %d\n", server_port);
+    printf("Path : %s\n", request->path);
     int remoteServersocket = connectRemoteServer(request->host, server_port);
 
     int bytes_send = send(remoteServersocket, buff, strlen(buff), 0);       //we send HTTP request we made inside buffer
@@ -92,7 +104,7 @@ int handle_request(int client_socket, struct ParsedRequest *request, char* tempr
     int temp_buff_index = 0;
 
     while(bytes_recv>0){
-        bytes_send = send(client_socket, buff, bytes_send, 0);
+        bytes_send = send(client_socket, buff, bytes_recv, 0);
         for(int i = 0 ; i<bytes_send/sizeof(char) ; i++){
             temp_buff[temp_buff_index] = buff[i];
             temp_buff_index++;
@@ -127,7 +139,7 @@ int checkHTTPversion(char* version){
 
 
 
-int ErrorMessage(int socket, int status_code)
+int Error_message(int socket, int status_code)
 {
 	char str[1024];
 	char currentTime[50];
@@ -182,8 +194,9 @@ struct element_inside_cache* find(char* url){
     if(head!=NULL){
         temp_website = head;
         while(temp_website!=NULL){
-            if(strcmp(temp_website->url, url)){
-                printf("URL found\n");
+            printf("starting search in cache\n");
+            if(strcmp(temp_website->url, url) == 0){
+                printf("URL found in cache\n");
                 printf("LRU number of usage before %d\n", temp_website->number_of_usage);
                 temp_website->number_of_usage++;
                 printf("LRU number of usage after %d\n", temp_website->number_of_usage);
@@ -204,7 +217,7 @@ int adding_element_in_cache(char* data, int len, char* url){
     int temp_lock = pthread_mutex_lock(&lock);
     printf("Lock acquired by for adding element %d\n", temp_lock);
     int element_size = len + strlen(url) + sizeof(struct element_inside_cache);    
-    if(element_size<MAX_ELEMENT_SIZE){
+    if(element_size>MAX_ELEMENT_SIZE){
         temp_lock = pthread_mutex_unlock(&lock);
         printf("to much");
         return 0;
@@ -215,16 +228,17 @@ int adding_element_in_cache(char* data, int len, char* url){
         }
         struct element_inside_cache *element = (struct element_inside_cache*)malloc(sizeof(struct element_inside_cache));
         element->data = (char*)malloc(len+1);
-        strcpt(element->data, data);
+        strcpy(element->data, data);
         element->url = (char*)malloc(strlen(url)*sizeof(char)+1);
         strcpy(element->url, url);
-        element->number_of_usage = 1;
+        element->number_of_usage = 0;
+        printf("number of usage of %s is %d", url, element->number_of_usage);
         element->next = head;
         head = element;
         element->len = len;
         cache_size = cache_size + element_size;
         temp_lock = pthread_mutex_unlock(&lock);
-        printf("Added element into the cache");
+        printf("Added element into the cache\n");
         return 1;
     }
     return 0;
@@ -263,7 +277,7 @@ void remove_cache_element(){
     free(least);
 
     pthread_mutex_unlock(&lock);
-    printf("removed leasted used element");
+    printf("removed leasted used element\n");
     return;
 }
     

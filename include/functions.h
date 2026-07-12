@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <netdb.h>
-
+#include <unistd.h>
 #define MAX_BYTES 4000
 #define MAX_CLIENTS 10
 # define MAX_SIZE 10
@@ -25,19 +25,20 @@ struct element_inside_cache{    //websites
 };
 
 
-int port = 8080;
-int server_socket_id;
+extern int port;
+extern int server_socket_id;
 
-pthread_t clients[MAX_CLIENTS];
-pthread_mutex_t lock;
-sem_t semaphore;
+extern pthread_t clients[MAX_CLIENTS];
+extern pthread_mutex_t lock;
+extern sem_t semaphore;
 
-int cache_size;
+extern int cache_size;
+extern struct element_inside_cache *head;
 
-handle_request(int client_socket, struct ParsedRequest *request, char* tempreq);
-connectRemoteServer(char* host_addrs, int server_port);
+int handle_request(int client_socket, struct ParsedRequest *request, char* tempreq);
+int connectRemoteServer(char* host_addrs, int server_port);
 int checkHTTPversion(char* version);
-int ErrorMessage(int socket, int status_code);
+int Error_message(int socket, int status_code);
 int adding_element_in_cache(char* data, int len, char* url);
 struct element_inside_cache* find(char* url);
 void remove_cache_element();
