@@ -1,12 +1,5 @@
 #include"functions.h"
 
-struct element_inside_cache{    //websites
-    char* data;
-    int len;
-    char* url;
-    int number_of_usage;   //number of time that cache element is being used, more number = more priority
-    struct element_inside_cache *next;
-};
 
 struct element_inside_cache* head;  //pointer to starting of cache
 
@@ -207,3 +200,70 @@ struct element_inside_cache* find(char* url){
     return temp_website;
 }
 
+int adding_element_in_cache(char* data, int len, char* url){
+    int temp_lock = pthread_mutex_lock(&lock);
+    printf("Lock acquired by for adding element %d\n", temp_lock);
+    int element_size = len + strlen(url) + sizeof(struct element_inside_cache);    
+    if(element_size<MAX_ELEMENT_SIZE){
+        temp_lock = pthread_mutex_unlock(&lock);
+        printf("to much");
+        return 0;
+    }
+    else{
+        while(cache_size+element_size>MAX_CACHE_SIZE){
+            remove_cache_element();
+        }
+        struct element_inside_cache *element = (struct element_inside_cache*)malloc(sizeof(struct element_inside_cache));
+        element->data = (char*)malloc(len+1);
+        strcpt(element->data, data);
+        element->url = (char*)malloc(strlen(url)*sizeof(char)+1);
+        strcpy(element->url, url);
+        element->number_of_usage = 1;
+        element->next = head;
+        head = element;
+        element->len = len;
+        cache_size = cache_size + element_size;
+        temp_lock = pthread_mutex_unlock(&lock);
+        printf("Added element into the cache");
+        return 1;
+    }
+    return 0;
+}
+
+void remove_cache_element(){
+   
+    struct element_inside_cache *least = head;
+    struct element_inside_cache *least_prev = NULL;
+
+    struct element_inside_cache *curr = head;
+    struct element_inside_cache *prev = NULL;
+
+    // Find least frequently used node
+    while (curr != NULL) {
+        if (curr->number_of_usage < least->number_of_usage) {
+            least = curr;                           //if 2 or more have same number of usage it will pick anyone
+            least_prev = prev;                      
+        }
+
+        prev = curr;
+        curr = curr->next;
+    }
+
+    // Remove node
+    if (least_prev == NULL) {
+        // Head is the least-used node
+        head = head->next;
+    } else {
+        least_prev->next = least->next; //connecting with element after least used element to remove least used
+    }
+
+    // Free resources, removed least used element
+    free(least->data);
+    free(least->url);
+    free(least);
+
+    pthread_mutex_unlock(&lock);
+    printf("removed leasted used element");
+    return;
+}
+    
