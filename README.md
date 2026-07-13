@@ -9,7 +9,7 @@ This project implements a **forward HTTP proxy**: a server that sits between a c
 When a client is configured to use this proxy, requests flow like this:
 
 Client  ──────►  Proxy Server  ──────►  Destination Web Server
-(browser/curl)   (this project)         (e.g. example.com)
+
 Client  ◄──────  Proxy Server  ◄──────  Destination Web Server
 
 ## Features
