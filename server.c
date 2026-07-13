@@ -2,8 +2,23 @@
 #include "include/functions.h"
 
 
-
-
+// http://localhost:8080/https://www.cs.princeton.edu/  
+// Browser (Brave) treats /https://www.cs.princeton.edu/ as just a normal
+// path on localhost:8080 — it has no idea a real URL is embedded in there.
+//
+// Our server receives the raw request, and ParsedRequest_parse() scans
+// the path for "://" and extracts host = www.cs.princeton.edu, path = "/"
+// (this only works because the parser is lenient about where "://" appears,
+// not because it's designed for this exact trick)
+//
+// We then build a brand NEW HTTP request (GET / HTTP/1.1, Host: princeton...)
+// open a SEPARATE socket connection to princeton's real server,
+// and send that new request there
+//
+// We receive princeton's response on that separate socket,
+// forward it back to the browser on the ORIGINAL socket (the one Brave
+// is still waiting on), and also store a copy in our cache using the
+// original raw request as the key
 
 //its going to be a linked list of elements in cache
 // struct element_inside_cache{
