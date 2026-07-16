@@ -22,3 +22,14 @@ Client  ◄──────  Proxy Server  ◄──────  Destination 
   - Per-element size limits (`MAX_ELEMENT_SIZE`) to prevent any single response from dominating the cache
 - **Custom HTTP error responses** for common status codes (400, 403, 404, 500, 501, 505)
 - **Thread-safe cache access** guarded by a mutex
+
+## Benchmark
+
+## Benchmark Results
+
+Tested using `curl` against `www.google.com` — first request (cache miss) vs. second request (cache hit):
+
+(benchmark/Screenshot 2026-07-16 135444.png)
+
+
+Cache hits reduced response time from ~520ms to ~0.5ms — a ~99.9% latency reduction.
