@@ -206,10 +206,10 @@ struct element_inside_cache* find(char* url){
         }
     }
     else{
-        printf("NO URL in Cache");
+        printf("NO URL in Cache\n");
     }
     temp_lock = pthread_mutex_unlock(&lock);
-    printf("done finding for url");
+    printf("done finding for url\n");
     return temp_website;
 }
 
