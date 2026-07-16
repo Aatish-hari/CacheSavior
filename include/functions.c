@@ -197,9 +197,9 @@ struct element_inside_cache* find(char* url){
             
             if(strcmp(temp_website->url, url) == 0){
                 printf("URL found in cache\n");
-                printf("LRU number of usage before %d\n", temp_website->number_of_usage);
+                printf("LFU number of usage before %d\n", temp_website->number_of_usage);
                 temp_website->number_of_usage++;
-                printf("LRU number of usage after %d\n", temp_website->number_of_usage);
+                printf("LFU number of usage after %d\n", temp_website->number_of_usage);
                 break;
             }
             temp_website = temp_website->next;
