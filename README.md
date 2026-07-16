@@ -29,7 +29,7 @@ Client  ◄──────  Proxy Server  ◄──────  Destination 
 Tested using `curl` against `www.google.com` — first request (cache miss) vs. second request (cache hit):
 
 ![Benchmark screenshot](benchmark/Screenshot%202026-07-16%20135444.png)
-![serverside screenshot](benchmark/Screenshot 2026-07-16 140009.png)
+![serverside screenshot](benchmark/Screenshot%202026-07-16%20140009.png)
 
 
 Cache hits reduced response time from ~520ms to ~0.5ms — a ~99.9% latency reduction.
