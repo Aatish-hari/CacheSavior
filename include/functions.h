@@ -14,8 +14,8 @@
 #define MAX_BYTES 4000
 #define MAX_CLIENTS 10
 # define MAX_SIZE 10
-#define MAX_ELEMENT_SIZE 10*(1<<8)
-#define MAX_CACHE_SIZE (100 * 1024 * 1024)
+#define MAX_ELEMENT_SIZE (100*1024)   // 100 * 1024 = 102400 bytes = 100 KB
+#define MAX_CACHE_SIZE (10 * 1024 * 1024) // 10 MB
 struct element_inside_cache{    //websites
     char* data;
     int len;

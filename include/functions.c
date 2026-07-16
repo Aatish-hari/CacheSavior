@@ -129,8 +129,8 @@ int handle_request(int client_socket, struct ParsedRequest *request, char* tempr
 int checkHTTPversion(char* version){
     int ans = -1;
     if(strncmp(version, "HTTP/1.1", 8) == 0 || strncmp(version, "HTTP/1.0", 8) == 0){
-        ans = 1;
-    }
+        ans = 1;            //this project only for version http/1s
+    }                       //HTTP/2 — binary, multiplexed, a completely different wire format
     else{
         ans = -1;
     }
@@ -219,7 +219,7 @@ int adding_element_in_cache(char* data, int len, char* url){
     int element_size = len + strlen(url) + sizeof(struct element_inside_cache);    
     if(element_size>MAX_ELEMENT_SIZE){
         temp_lock = pthread_mutex_unlock(&lock);
-        printf("to much");
+        printf("Error: Response is bigger than MAX_ELEMENT_SIZE,");
         return 0;
     }
     else{
