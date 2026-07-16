@@ -23,7 +23,6 @@ Client  ◄──────  Proxy Server  ◄──────  Destination 
 - **Custom HTTP error responses** for common status codes (400, 403, 404, 500, 501, 505)
 - **Thread-safe cache access** guarded by a mutex
 
-## Benchmark
 
 ## Benchmark Results
 
